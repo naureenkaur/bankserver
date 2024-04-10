@@ -1,0 +1,19 @@
+{
+  "name": "bankserver",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/naureenkaur/bankserver.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/naureenkaur/bankserver/issues"
+  },
+  "homepage": "https://github.com/naureenkaur/bankserver#readme"
+}
