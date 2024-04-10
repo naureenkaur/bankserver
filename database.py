@@ -2,6 +2,7 @@ import sqlite3
 import hashlib
 import os
 import secrets
+from datetime import datetime
 
 # Function to create the SQLite database and table
 def create_database():
@@ -12,7 +13,8 @@ def create_database():
                   username TEXT UNIQUE,
                   password_hash TEXT,
                   encryption_key BLOB,
-                  mac_key BLOB)''')
+                  mac_key BLOB,
+                  amount INTEGER)''')  # Add 'amount' column
     conn.commit()
     conn.close()
 
@@ -32,18 +34,18 @@ def generate_encryption_key():
 def generate_mac_key():
     return secrets.token_bytes(16)  # 128-bit MAC key
 
-# Function to initialize the database with predefined users
+# Function to initialize the database with predefined users and amounts
 def initialize_database():
-    predefined_users = [('Alice', 'password123'), ('Bob', 'password123'), ('Charlie', 'password123')]
+    predefined_users = [('Alice', 'password123', 1000), ('Bob', 'securepwd', 2000), ('Charlie', 'password', 3000)]
     conn = sqlite3.connect('bank.db')
     c = conn.cursor()
-    for username, password in predefined_users:
+    for username, password, amount in predefined_users:
         salt = generate_salt()
         password_hash = hash_password(password, salt)
         encryption_key = generate_encryption_key()
         mac_key = generate_mac_key()
-        c.execute('''INSERT INTO users (username, password_hash, encryption_key, mac_key)
-                     VALUES (?, ?, ?, ?)''', (username, password_hash, encryption_key, mac_key))
+        c.execute('''INSERT INTO users (username, password_hash, encryption_key, mac_key, amount)
+                     VALUES (?, ?, ?, ?, ?)''', (username, password_hash, encryption_key, mac_key, amount))
     conn.commit()
     conn.close()
 
@@ -64,6 +66,28 @@ def authenticate_user(username, password):
             return True
     return False
 
+# Function to add funds to a user's account
+def add_funds(username, amount):
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute('''UPDATE users SET amount = amount + ? WHERE username = ?''', (amount, username))
+    conn.commit()
+    conn.close()
+
+# Function to remove funds from a user's account
+def remove_funds(username, amount):
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute('''UPDATE users SET amount = amount - ? WHERE username = ?''', (amount, username))
+    conn.commit()
+    conn.close()
+
+# Function to log transaction
+def log_transaction(username, action, amount):
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("transaction_log.txt", "a") as file:
+        file.write(f"Username: {username}, Action: {action}, Amount: {amount}, Time: {now}\n")
+
 # Main function
 def main():
     create_database()
@@ -76,6 +100,10 @@ def main():
             print(f"Authentication successful for user: {user}")
         else:
             print(f"Authentication failed for user: {user}")
+
+    # Example transactions
+    add_funds('Alice', 300)  # Add 300 to Alice's account
+    remove_funds('Bob', 500)  # Remove 500 from Bob's account
 
 if __name__ == "__main__":
     main()
