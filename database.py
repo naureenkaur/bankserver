@@ -34,7 +34,7 @@ def generate_mac_key():
 
 # Function to initialize the database with predefined users
 def initialize_database():
-    predefined_users = [('Alice', 'password123'), ('Bob', 'securepwd'), ('Charlie', 'password')]
+    predefined_users = [('Alice', 'password123'), ('Bob', 'password123'), ('Charlie', 'password123')]
     conn = sqlite3.connect('bank.db')
     c = conn.cursor()
     for username, password in predefined_users:
