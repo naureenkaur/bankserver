@@ -8,13 +8,23 @@ from datetime import datetime
 def create_database():
     conn = sqlite3.connect('bank.db')
     c = conn.cursor()
+    # Create users table if it doesn't exist, now including a salt column
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
                   username TEXT UNIQUE,
                   password_hash TEXT,
                   encryption_key BLOB,
                   mac_key BLOB,
-                  amount INTEGER)''')  # Add 'amount' column
+                  amount INTEGER,
+                  salt BLOB)''')  # Added salt column
+    # Create transactions table if it doesn't exist
+    c.execute('''CREATE TABLE IF NOT EXISTS transactions
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username TEXT,
+                  action TEXT,
+                  amount INTEGER,
+                  time TEXT,
+                  FOREIGN KEY(username) REFERENCES users(username))''')
     conn.commit()
     conn.close()
 
@@ -28,11 +38,11 @@ def hash_password(password, salt):
 
 # Function to generate encryption key
 def generate_encryption_key():
-    return secrets.token_bytes(16)  # 128-bit encryption key
+    return secrets.token_bytes(16)
 
 # Function to generate MAC key
 def generate_mac_key():
-    return secrets.token_bytes(16)  # 128-bit MAC key
+    return secrets.token_bytes(16)
 
 # Function to initialize the database with predefined users, amounts, and transactions
 def initialize_database():
@@ -44,13 +54,20 @@ def initialize_database():
     conn = sqlite3.connect('bank.db')
     c = conn.cursor()
     for username, password, amount, transactions in predefined_users:
-        salt = generate_salt()
-        password_hash = hash_password(password, salt)
-        encryption_key = generate_encryption_key()
-        mac_key = generate_mac_key()
-        c.execute('''INSERT INTO users (username, password_hash, encryption_key, mac_key, amount) VALUES (?, ?, ?, ?, ?)''', (username, password_hash, encryption_key, mac_key, amount))
-        for transaction in transactions:
-            c.execute('''INSERT INTO transactions (username, action, amount, time) VALUES (?, ?, ?, ?)''', (username, transaction['action'], transaction['amount'], transaction['time']))
+        # Check if the user already exists
+        c.execute('''SELECT id FROM users WHERE username=?''', (username,))
+        if c.fetchone() is None:
+            salt = generate_salt()
+            password_hash = hash_password(password, salt)
+            encryption_key = generate_encryption_key()
+            mac_key = generate_mac_key()
+            # Now also inserting the salt into the database
+            c.execute('''INSERT INTO users (username, password_hash, encryption_key, mac_key, amount, salt) VALUES (?, ?, ?, ?, ?, ?)''',
+                      (username, password_hash, encryption_key, mac_key, amount, salt))
+            for transaction in transactions:
+                c.execute('''INSERT INTO transactions (username, action, amount, time) VALUES (?, ?, ?, ?)''', (username, transaction['action'], transaction['amount'], transaction['time']))
+        else:
+            print(f"User {username} already exists, skipping insertion.")
     conn.commit()
     conn.close()
 
@@ -58,19 +75,17 @@ def initialize_database():
 def authenticate_user(username, password):
     conn = sqlite3.connect('bank.db')
     c = conn.cursor()
-    c.execute('''SELECT password_hash FROM users WHERE username=?''', (username,))
+    # Retrieve password hash and salt for the user
+    c.execute('''SELECT password_hash, salt FROM users WHERE username=?''', (username,))
     result = c.fetchone()
     if result:
-        stored_password_hash = result[0]
-        # Retrieve salt from stored password hash
-        salt = stored_password_hash[:16]
-        # Hash the provided password with the retrieved salt
+        stored_password_hash, salt = result
         provided_password_hash = hash_password(password, salt)
-        # Compare the stored password hash with the hash of the provided password
         if stored_password_hash == provided_password_hash:
             return True
     return False
 
+# Functions for adding funds, removing funds, logging transactions, and retrieving transaction history remain unchanged
 # Function to add funds to a user's account
 def add_funds(username, amount):
     conn = sqlite3.connect('bank.db')
@@ -114,14 +129,14 @@ def main():
     # Authenticate the predefined users
     users = ['Alice', 'Bob', 'Charlie']
     for user in users:
-        if authenticate_user(user, 'password123'):  # Assuming password for all predefined users is 'password123'
+        if authenticate_user(user, 'password123'):
             print(f"Authentication successful for user: {user}")
         else:
             print(f"Authentication failed for user: {user}")
 
     # Example transactions
-    add_funds('Alice', 300)  # Add 300 to Alice's account
-    remove_funds('Bob', 500)  # Remove 500 from Bob's account
+    add_funds('Alice', 300)
+    remove_funds('Bob', 500)
 
     # Retrieve transaction history for each user
     for user in users:
