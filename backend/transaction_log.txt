@@ -1,0 +1,15 @@
+Username: Alice, Action: Add Funds, Amount: 300, Time: 2024-04-10 22:58:00
+Username: Bob, Action: Remove Funds, Amount: 500, Time: 2024-04-10 22:58:00
+Username: Alice, Action: Add Funds, Amount: None, Time: 2024-04-10 23:09:22
+Username: Alice, Action: Add Funds, Amount: None, Time: 2024-04-10 23:09:34
+Username: Alice, Action: Add Funds, Amount: None, Time: 2024-04-10 23:09:36
+Username: Alice, Action: Add Funds, Amount: None, Time: 2024-04-10 23:09:38
+Username: Alice, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:09:44
+Username: Alice, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:09:51
+Username: Alice, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:10:21
+Username: Alice, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:10:22
+Username: Bob, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:10:36
+Username: Bob, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:10:39
+Username: Bob, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:10:40
+Username: Bob, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:11:43
+Username: Bob, Action: Add Funds, Amount: 500, Time: 2024-04-10 23:11:44
