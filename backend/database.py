@@ -122,28 +122,19 @@ def get_transaction_history(username):
     return transactions
 
 # Main function
+# Main function
 def main():
     create_database()
     initialize_database()
 
-    # Authenticate the predefined users
-    users = ['Alice', 'Bob', 'Charlie']
-    for user in users:
-        if authenticate_user(user, 'password123'):
+    # Corrected authentication checks with appropriate passwords
+    predefined_users_passwords = {'Alice': 'password123', 'Bob': 'securepwd', 'Charlie': 'password'}
+    for user, password in predefined_users_passwords.items():
+        if authenticate_user(user, password):
             print(f"Authentication successful for user: {user}")
         else:
             print(f"Authentication failed for user: {user}")
 
-    # Example transactions
-    add_funds('Alice', 300)
-    remove_funds('Bob', 500)
-
-    # Retrieve transaction history for each user
-    for user in users:
-        transactions = get_transaction_history(user)
-        print(f"Transaction history for {user}:")
-        for transaction in transactions:
-            print(transaction)
 
 if __name__ == "__main__":
     main()

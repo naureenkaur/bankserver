@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, send_from_directory, send_file
+from flask_cors import CORS
 import sqlite3
 import hashlib
 import os
@@ -7,13 +8,14 @@ from database import authenticate_user, add_funds, remove_funds
 
 app = Flask(__name__)
 
+# Enable CORS for all routes and origins
+CORS(app, resources={r"/*": {"origins": "*"}})
+
 # Login Endpoint
 @app.route('/login', methods=['POST'])
 def login():
-    print(request.json)
     username = request.json.get('username')
     password = request.json.get('password')
-    print(request)
     if authenticate_user(username, password):
         # This is a simplified example. In a real application, you should return a secure token (e.g., JWT)
         return jsonify({"message": "Login successful", "authenticated": True}), 200
@@ -35,6 +37,20 @@ def withdraw_money():
     amount = request.json.get('amount')
     remove_funds(username, amount)
     return jsonify({"message": f"Withdrew {amount} from {username}'s account"}), 200
+
+# View Balance Endpoint
+@app.route('/view_balance', methods=['POST'])
+def view_balance():
+    username = request.json.get('username')
+    conn = sqlite3.connect('bank.db')
+    c = conn.cursor()
+    c.execute('''SELECT amount FROM users WHERE username = ?''', (username,))
+    result = c.fetchone()
+    conn.close()
+    if result:
+        return jsonify({"balance": result[0]}), 200
+    else:
+        return jsonify({"message": "User not found"}), 404
 
 # Download Audit Log Endpoint
 @app.route('/download_audit_log', methods=['GET'])
