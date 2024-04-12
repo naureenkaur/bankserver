@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
-
-// Ensure your CSS file is correctly linked
 import "./SignIn.css";
 
 const SignIn = () => {
@@ -19,10 +17,20 @@ const SignIn = () => {
     }
   }, [isAuthenticated, navigate]);
 
+  async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password); // Converts password to a Uint8Array
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data); // Hashes the data
+    const hashArray = Array.from(new Uint8Array(hashBuffer)); // Converts hash to byte array
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // Converts bytes to hex string
+    return hashHex;
+  };
+
+
   const onLoginButtonClick = async (e) => {
     e.preventDefault(); // Prevent the default form submission behavior
 
-    const jsonData = { username, password };
+    const jsonData = { username, password }; // Send plaintext password
     console.log("Attempting to log in with:", jsonData);
 
     try {
@@ -35,7 +43,6 @@ const SignIn = () => {
       });
 
       const data = await response.json();
-
       console.log("Login response:", data);
 
       if (response.ok && data.authenticated) {
@@ -44,6 +51,7 @@ const SignIn = () => {
         setIsAuthenticated(true); // Set isAuthenticated to true upon successful login
         sessionStorage.setItem("username", username);
         sessionStorage.setItem("authenticated", true);
+        navigate("/Transactions"); // Redirect after login
       } else {
         console.error("Login failed:", data);
         setErrorMessage(data.message || "Invalid username or password.");
@@ -51,20 +59,8 @@ const SignIn = () => {
     } catch (error) {
       console.error("Error during sign in:", error);
       setErrorMessage("Error during sign in. Please try again.");
-
-      //   if (response.ok && data.token) {
-      //     const cookies = new Cookies();
-      //     cookies.set("jwt", data.token, { path: "/" });
-      //     setIsAuthenticated(true); // Set isAuthenticated to true upon successful login
-      //   } else {
-      //     console.error("Login failed:", data);
-      //     setErrorMessage(data.message || "Invalid username or password.");
-      //   }
-      // } catch (error) {
-      //   console.error("Error during sign in:", error);
-      //   setErrorMessage("Error during sign in. Please try again.");
     }
-  };
+};
 
   return (
     <div className="form-container">
