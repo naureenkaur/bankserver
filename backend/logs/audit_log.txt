@@ -1,0 +1,33 @@
+CustomerID: 4008 - User Alice logged in. Balance: $1000. 04/09/24 @ 18:49:14
+User Alice checked their balance. Balance: $1000. 04/09/24 @ 18:49:17
+User Alice deposited an amount. 04/09/24 @ 18:49:22
+User Alice withdrew $200.0. New balance: $900.0. 04/09/24 @ 18:49:27
+
+CustomerID: 3469 - User Alice logged in. Balance: $1000. 04/09/24 @ 18:51:04
+User Alice checked their balance. Balance: $1000. 04/09/24 @ 18:51:05
+User Alice withdrew $200.0. New balance: $900.0. 04/09/24 @ 18:51:23
+
+CustomerID: 4473 - User Alice logged in. Balance: $1000. 04/09/24 @ 18:52:27
+User Alice checked their balance. Balance: $1000. 04/09/24 @ 18:52:29
+User Alice deposited an amount. 04/09/24 @ 18:52:34
+User Alice withdrew $200.0. New balance: $900.0. 04/09/24 @ 18:52:42
+User Alice checked their balance. Balance: $900.0. 04/09/24 @ 18:52:44
+
+Username: Alice, Action: Deposit, Amount: 200.0, Time: 2024-04-09 18:57:26 
+CustomerID: 7325 - User Alice logged in. Balance: $1000. 04/09/24 @ 18:57:13
+User Alice checked their balance. Balance: $1000. 04/09/24 @ 18:57:16
+User Alice withdrew $200.0. New balance: $800.0. 04/09/24 @ 18:57:22
+User Alice deposited an amount. 04/09/24 @ 18:57:28
+
+Username: Alice, Action: Deposit, Amount: 100.0, Time: 2024-04-09 19:02:33 
+CustomerID: 5025 - User Alice logged in. Balance: $1000. 04/09/24 @ 19:02:23
+User Alice withdrew $200.0. New balance: $800.0. 04/09/24 @ 19:02:29
+User Alice has deposited $b'\x0e\xc57g\xbc\xc3\xb9\xcf\xc9\xd9\x8cb\xe8\xe3\x96\x13\x97\x105\xb4\xcb\x1d\x9ad\x8f\xcc\xc9\x11-\x12z\xbb' the new balance is $900.0  04/09/24 @ 19:02:38
+User Alice checked their balance. Balance: $900.0. 04/09/24 @ 19:02:39
+
+Username: Alice, Action: Deposit, Amount: 300.0, Time: 2024-04-09 19:06:21 
+CustomerID: 5914 - User Alice logged in. Balance: $1000. 04/09/24 @ 19:06:10
+User Alice checked their balance. Balance: $1000. 04/09/24 @ 19:06:13
+User Alice withdrew $200.0. New balance: $800.0. 04/09/24 @ 19:06:17
+User Alice has deposited $300.0 the new balance is $1100.0  04/09/24 @ 19:06:22
+

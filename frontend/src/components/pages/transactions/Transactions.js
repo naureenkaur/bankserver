@@ -1,11 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Cookies from "universal-cookie";
 import CryptoJS from "crypto-js";
 import "./Transactions.css";
 
 function Transactions() {
   const navigate = useNavigate();
+  const isAuthenticated = sessionStorage.getItem("isAuthenticated");
+
+  useEffect(() => {
+    // Redirect to signin page if not authenticated
+    if (!isAuthenticated) {
+      navigate("/signin");
+    }
+  }, [isAuthenticated, navigate]);
+
   const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState("");
   const [showInputAdd, setShowInputAdd] = useState(false);
@@ -15,21 +23,6 @@ function Transactions() {
   const username = sessionStorage.getItem("username");
   const encryptionKey = sessionStorage.getItem("encryptionKey"); // Ensure this key is securely provided and stored
   const macKey = sessionStorage.getItem("macKey"); // Ensure this key is securely provided and stored
-
-  const handleAction = (type) => {
-    if (type === "withdraw") {
-      setShowInputWithdraw(true);
-      setShowInputAdd(false);
-    } else if (type === "add") {
-      setShowInputAdd(true);
-      setShowInputWithdraw(false);
-    }
-    setShowBalance(false);
-  };
-
-  const handleChange = (event) => {
-    setAmount(event.target.value);
-  };
 
   const encryptData = (data) => {
     const ciphertext = CryptoJS.AES.encrypt(JSON.stringify(data), CryptoJS.enc.Utf8.parse(encryptionKey), {
@@ -87,39 +80,13 @@ function Transactions() {
     const data = await handleTransaction("view_balance", jsonData);
     console.log("Balance response:", data);
 
-    if (data.balance !== undefined) setBalance(data.balance);
+    if (data.balance !== undefined) {
+      setBalance(data.balance);
+    }
     setShowBalance(!showBalance);
     setShowInputAdd(false);
     setShowInputWithdraw(false);
   };
-
-  const renderInputFormAdd = () => (
-    <form onSubmit={handleSubmitAdd}>
-      <input
-        type="number"
-        name="amount"
-        placeholder="Enter amount"
-        value={amount}
-        onChange={handleChange}
-        required
-      />
-      <button className="form-button">Submit</button>
-    </form>
-  );
-
-  const renderInputFormWithdraw = () => (
-    <form onSubmit={handleSubmitWithdraw}>
-      <input
-        type="number"
-        name="amount"
-        placeholder="Enter amount"
-        value={amount}
-        onChange={handleChange}
-        required
-      />
-      <button className="form-button">Submit</button>
-    </form>
-  );
 
   const handleAudit = async () => {
     const response = await fetch("http://127.0.0.1:5000/download_audit_log", {
@@ -138,43 +105,32 @@ function Transactions() {
     }
   };
 
-  const handleLogout = async () => {
-    const response = await fetch("http://127.0.0.1:5000/logout", {
-      method: "GET",
-    });
-    if (response.ok) {
-      const cookies = new Cookies();
-      cookies.remove("jwt", { path: "/" });
-      sessionStorage.clear();
-      navigate("/signin");
-    }
+  const handleLogout = () => {
+    sessionStorage.clear();
+    navigate("/signin");
   };
 
   return (
     <div className="form-container">
       <div className="landing-form">
-        <button className="form-button" onClick={() => handleAction("withdraw")}>
-          Withdraw
-        </button>
-        <button className="form-button" onClick={() => handleAction("add")}>
-          Add
-        </button>
-        <button className="form-button" onClick={handleBalance}>
-          View Current Balance
-        </button>
-        <button className="form-button" onClick={handleAudit}>
-          Download Audit
-        </button>
-        <button className="form-button" onClick={handleLogout}>
-          Logout
-        </button>
-        {showInputAdd && renderInputFormAdd()}
-        {showInputWithdraw && renderInputFormWithdraw()}
-        {showBalance && (
-          <div className="balance-display">
-            Your current balance is: ${balance.toFixed(2)}
-          </div>
+        <button className="form-button" onClick={() => setShowInputAdd(true)}>Add Funds</button>
+        <button className="form-button" onClick={() => setShowInputWithdraw(true)}>Withdraw Funds</button>
+        <button className="form-button" onClick={handleBalance}>View Current Balance</button>
+        <button className="form-button" onClick={handleAudit}>Download Audit</button>
+        <button className="form-button" onClick={handleLogout}>Logout</button>
+        {showInputAdd && (
+          <form onSubmit={handleSubmitAdd}>
+            <input type="number" name="amount" placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+            <button className="form-button">Submit</button>
+          </form>
         )}
+        {showInputWithdraw && (
+          <form onSubmit={handleSubmitWithdraw}>
+            <input type="number" name="amount" placeholder="Enter amount" value={amount} onChange={(e) => setAmount(e.target.value)} required />
+            <button className="form-button">Submit</button>
+          </form>
+        )}
+        {showBalance && <div className="balance-display">Your current balance is: ${balance.toFixed(2)}</div>}
       </div>
     </div>
   );

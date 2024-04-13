@@ -1,33 +1,48 @@
+import os
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.backends import default_backend  # Correct import for default_backend
 
-def derive_encryption_and_mac_keys(master_secret, salt=None, info=b'handshake data encryption and mac'):
+def derive_keys(master_secret):
     """
-    Derive two keys from the master secret using HKDF: one for encryption, one for MAC.
-    
-    Parameters:
-        master_secret (bytes): The shared master secret.
-        salt (bytes): Optional salt value (a non-secret random value); if not provided, it's assumed to be all zeros.
-        info (bytes): Optional context and application specific information.
-    
+    Derives AES and MAC keys from the master secret using HKDF.
+    Args:
+    - master_secret (bytes): The master secret.
     Returns:
-        tuple: Contains two bytes objects, the first for encryption key and the second for MAC key.
+    - encryption_key (bytes): Key for data encryption.
+    - mac_key (bytes): Key for message authentication code.
     """
-    # HKDF setup to derive keys
-    hkdf = HKDF(
+    # Use a random salt, securely generated for key derivation
+    salt = os.urandom(16)  # A secure random salt
+    info_encryption = b'encryption_key'
+    info_mac = b'mac_key'
+
+    # HKDF instance for deriving an encryption key
+    hkdf_encryption = HKDF(
         algorithm=hashes.SHA256(),
-        length=64,  # Total bytes: 32 for AES key, 32 for MAC key
+        length=32,
         salt=salt,
-        info=info,
+        info=info_encryption,
         backend=default_backend()
     )
     
-    # Derive keys
-    derived_keys = hkdf.derive(master_secret)
-    
-    # Split the derived bytes into an encryption key and a MAC key
-    encryption_key = derived_keys[:32]
-    mac_key = derived_keys[32:]
-    
+    # HKDF instance for deriving a MAC key
+    hkdf_mac = HKDF(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        info=info_mac,
+        backend=default_backend()
+    )
+
+    encryption_key = hkdf_encryption.derive(master_secret)
+    mac_key = hkdf_mac.derive(master_secret)
+
     return encryption_key, mac_key
+
+# Example usage
+if __name__ == "__main__":
+    master_secret = b'YourMasterSecretHere'  # Replace with your actual securely managed master secret
+    encryption_key, mac_key = derive_keys(master_secret)
+    print("Encryption Key:", encryption_key.hex())
+    print("MAC Key:", mac_key.hex())
