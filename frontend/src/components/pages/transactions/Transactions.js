@@ -5,7 +5,7 @@ import "./Transactions.css";
 
 function Transactions() {
   const navigate = useNavigate();
-  const isAuthenticated = sessionStorage.getItem("isAuthenticated");
+  const isAuthenticated = sessionStorage.getItem("isAuthenticated")  === "true";
 
   useEffect(() => {
     // Redirect to signin page if not authenticated

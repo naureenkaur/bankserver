@@ -3,17 +3,12 @@ import ReactDOM from "react-dom";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import SimpleReactLightbox from "simple-react-lightbox";
 
-import DefaultLayout from "./components/pages/signin/SignIn";
+import SignIn from "./components/pages/signin/SignIn";
 import Layout from "./components/app";
-
 import Transactions from "./components/pages/transactions/Transactions";
-
-import ProtectedRoute from "./components/ProtectedRoute";
 
 import "./index.css";
 import "./index.scss";
-
-import SignInProtectedRoute from "./components/SignInProtectedRoute";
 
 class Root extends React.Component {
   render() {
@@ -21,28 +16,13 @@ class Root extends React.Component {
       <BrowserRouter basename={"/"}>
         <SimpleReactLightbox>
           <Routes>
-            <Route
-              path="/signin"
-              element={
-                <SignInProtectedRoute>
-                  <DefaultLayout />
-                </SignInProtectedRoute>
-              }
-            />
-            <Route path="/" element={<DefaultLayout />} />
-
-            {/* Nested routes inside Layout component */}
+            <Route path="/signin" element={<SignIn />} />
             <Route path="/" element={<Layout />}>
-              <Route
-                path="transactions"
-                element={
-                  <ProtectedRoute>
-                    <Transactions />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Send all pages that do not exist to error page */}
+              <Route path="transactions" element={<Transactions />} />
+              {/* Additional routes can be nested here as needed */}
             </Route>
+            {/* Default route to handle root, you can adjust if you want a specific component at the root */}
+            <Route path="/" element={<SignIn />} />
           </Routes>
         </SimpleReactLightbox>
       </BrowserRouter>

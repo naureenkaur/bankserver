@@ -91,9 +91,8 @@ const onLoginButtonClick = async (e) => {
 
       const data = await response.json();
       if (response.ok && data.authenticated) {
-        console.log('Login successful, navigating to transactions...');
+        sessionStorage.setItem("isAuthenticated", "true"); // Save auth status in sessionStorage
         navigate("/transactions");
-        console.log('Navigation should have been executed');      
       } else {
           setErrorMessage(data.message || "Invalid username or password.");
       }
